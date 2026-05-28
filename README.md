@@ -43,40 +43,9 @@
 
 **QuKi-Notes** is a rapid note-capture application inspired by iOS Drafts, designed for quick, frictionless writing with powerful GitHub integration and cross-device syncing. The app opens immediately to a blank note—no setup, no friction. Write fast, sync seamlessly, and extend with workflows.
 
-Branches
---------
-`main` is the [deployed](https://ScottKirvan.github.io/QuKi-Notes/) branch.  The repo doesn't currently contain any other historic or dev branches.
-
-Repo Layout
------------
-```
-QuKi-Notes/
-├───lib/                        # Dart application source code
-│   ├───core/                   # Database, GitHub client, sync, settings
-│   ├───features/               # Editor, documents, workflows, onboarding
-│   └───shared/                 # Shared models and widgets
-├───android/                    # Android platform code
-├───windows/                    # Windows platform code
-├───ios/                        # iOS platform code (not actively built)
-├───docs/                       # VitePress documentation source
-├───.github/
-│   ├───workflows/              # CI/CD: tests, builds, releases
-│   ├───ISSUE_TEMPLATE/         # Bug report and feature request templates
-│   └───PULL_REQUEST_TEMPLATE.md # PR template
-├───assets/
-│   ├───css/                    # GitHub Pages styling
-│   └───media/                  # Images and logos
-├───notes/
-│   └───dev/                    # Design docs, specifications, decisions
-├───CODE_OF_CONDUCT.md
-├───CONTRIBUTING.md
-├───LICENSE.md
-├───justfile                    # Task automation
-└───README.md
-```
-
-Features
---------
+> [!NOTE]
+>> This is a **project-in-planning** - very early in development.  Come back to see more, soon :-)  I will be working with Claude-Code on this project - I'm an Sr. software engineer, UX designer, and product manager -- this project will *not* be ai-slop.  All design docs and Claude directives will be included in the project -- see [design_spec](07_GitRepos/ScottKirvan/Quki-Notes/notes/dev/design_spec.md) for the projects full roadmap and design plan to-date.
+## Features
 
 - **Rapid Capture**: App opens immediately to a blank note—no friction, no setup
 - **Local-First Storage**: Notes stored locally in SQLite; optional GitHub sync for cross-device access
@@ -88,25 +57,19 @@ Features
 - **Image Support**: Copy/paste images directly into notes; stored separately and synced via GitHub
 - **Offline-Ready**: Full local operation when GitHub is unavailable; push/pull resume when connectivity returns
 
-Table of Contents
------------------
-- [Branches](#branches)
-- [Repo Layout](#repo-layout)
+## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributions / Contact](#contributions--contact)
 
-Installation
-------------
-**TBD** — See [Development Setup](notes/dev/dev_env_setup.md) for Flutter/Dart environment configuration.
+## Installation
 
-Usage
------
-**TBD** — See [Design Spec](notes/dev/design_spec.md) and [Testing Guide](notes/dev/testing.md) for detailed documentation.
+**TBD** 
+## Usage
+**TBD** - [www.scottkirvan.com/QuKi-Notes](https://www.scottkirvan.com/QuKi-Notes) will eventually host the full user docs.
 
-Contributions / Contact
------------------------
+## Contributions / Contact
 - Please [file an issue](https://github.com/ScottKirvan/QuKi-Notes/issues/new), or [grab a fork](https://github.com/ScottKirvan/QuKi-Notes/fork), hack away, and submit a [pull request](https://github.com/ScottKirvan/QuKi-Notes/pulls).
 - Contact me at [linkedin.com/in/scottkirvan/](https://www.linkedin.com/in/scottkirvan/)
 - You can also contact me at my [discord](https://discord.gg/TSKHvVFYxB) server, I'm cptvideo.

@@ -1,30 +1,30 @@
-# Quki-Notes [![starline](https://starlines.qoo.monster/assets/ScottKirvan/Quki-Notes)](https://github.com/qoomon/starline)
+# QuKi-Notes [![starline](https://starlines.qoo.monster/assets/ScottKirvan/QuKi-Notes)](https://github.com/qoomon/starline)
 <div align="center">
 
   <img src="assets/media/logo.jpg" alt="logo" width="200" height="auto" />
-    <h1><a href="https://github.com/ScottKirvan/Quki-Notes">ScottKirvan/Quki-Notes</a></h1>
-  <h3>Nulla nobis dicta iste minus dolor repellendus aspernatur atque</h3>
+    <h1><a href="https://github.com/ScottKirvan/QuKi-Notes">ScottKirvan/QuKi-Notes</a></h1>
+  <h3>A quick, streamlined, cross-platform note taking app</h3>
   
   
 <!-- Badges -->
 <p>
-  <a href="https://github.com/ScottKirvan/Quki-Notes/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/ScottKirvan/Quki-Notes" alt="contributors" />
+  <a href="https://github.com/ScottKirvan/QuKi-Notes/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/ScottKirvan/QuKi-Notes" alt="contributors" />
   </a>
   <a href="">
-    <img src="https://img.shields.io/github/last-commit/ScottKirvan/Quki-Notes" alt="last update" />
+    <img src="https://img.shields.io/github/last-commit/ScottKirvan/QuKi-Notes" alt="last update" />
   </a>
-  <a href="https://github.com/ScottKirvan/Quki-Notes/network/members">
-    <img src="https://img.shields.io/github/forks/ScottKirvan/Quki-Notes" alt="forks" />
+  <a href="https://github.com/ScottKirvan/QuKi-Notes/network/members">
+    <img src="https://img.shields.io/github/forks/ScottKirvan/QuKi-Notes" alt="forks" />
   </a>
-  <a href="https://github.com/ScottKirvan/Quki-Notes/stargazers">
-    <img src="https://img.shields.io/github/stars/ScottKirvan/Quki-Notes" alt="stars" />
+  <a href="https://github.com/ScottKirvan/QuKi-Notes/stargazers">
+    <img src="https://img.shields.io/github/stars/ScottKirvan/QuKi-Notes" alt="stars" />
   </a>
-  <a href="https://github.com/ScottKirvan/Quki-Notes/issues/">
-    <img src="https://img.shields.io/github/issues/ScottKirvan/Quki-Notes" alt="open issues" />
+  <a href="https://github.com/ScottKirvan/QuKi-Notes/issues/">
+    <img src="https://img.shields.io/github/issues/ScottKirvan/QuKi-Notes" alt="open issues" />
   </a>
-  <a href="https://github.com/ScottKirvan/Quki-Notes/blob/main/LICENSE.md">
-    <img src="https://img.shields.io/github/license/ScottKirvan/Quki-Notes.svg" alt="license" />
+  <a href="https://github.com/ScottKirvan/QuKi-Notes/blob/main/LICENSE.md">
+    <img src="https://img.shields.io/github/license/ScottKirvan/QuKi-Notes.svg" alt="license" />
   </a>
   <a href="https://discord.gg/gQH4mXWQRT">
     <!--<img src="https://img.shields.io/discord/704680098577514527?style=flat-square&label=%F0%9F%92%AC%20discord&color=00ACD7">-->
@@ -33,82 +33,60 @@
 </p>
    
 <h4>
-    <a href="https://tinyurl.com/3vf7whyd">View Demo</a>
+    <a href="https://github.com/ScottKirvan/QuKi-Notes/blob/main/README.md">Documentation</a>
   <span> · </span>
-    <a href="https://github.com/ScottKirvan/Quki-Notes/blob/main/README.md">Documentation</a>
+    <a href="https://github.com/ScottKirvan/QuKi-Notes/issues/new?template=bug_report.md">Report Bug</a>
   <span> · </span>
-    <a href="https://github.com/ScottKirvan/Quki-Notes/issues/new?template=bug_report.md">Report Bug</a>
-  <span> · </span>
-    <a href="https://github.com/ScottKirvan/Quki-Notes/issues/new?template=feature_request.md">Request Feature</a>
+    <a href="https://github.com/ScottKirvan/QuKi-Notes/issues/new?template=feature_request.md">Request Feature</a>
   </h4>
 </div>
 
-**Quki-Notes** is voluptatibus magni nemo est. Nulla nobis dicta iste minus dolor repellendus aspernatur atque. Earum expedita aut inventore tempora fugiat deleniti. Molestias minima nam expedita beatae totam ipsa reprehenderit animi. Occaecati quibusdam beatae ducimus voluptate ut doloribus vitae amet. Quia ut ut voluptate dignissimos adipisci dolorum rem.
-
-## Getting Started with This Template
-
->[!IMPORTANT]
-> **Customization Checklist** - After creating a repository from this template, customize these items:
->
-> - [ ] Update the project description (line 5 above and in repository settings)
-> - [ ] Replace `assets/media/logo.jpg` with your project logo
-> - [ ] Update or remove the "View Demo" link (line 35)
-> - [ ] Update or remove the Discord badge/link (lines 28-31)
-> - [ ] Choose and apply a `.gitignore` from `.github/gitignore-templates/` (see [gitignore templates](.github/gitignore-templates/))
-> - [ ] Update the version in `.release-please-manifest.json` to your starting version (e.g., "0.1.0")
-> - [ ] Fill in the Features, Installation, and Usage sections below
-> - [ ] Review and update the [Code of Conduct](CODE_OF_CONDUCT.md) contact information
-> - [ ] Enable GitHub Pages in repository settings if you want a project website
-> - [ ] Remove or update this checklist section
+**QuKi-Notes** is a rapid note-capture application inspired by iOS Drafts, designed for quick, frictionless writing with powerful GitHub integration and cross-device syncing. The app opens immediately to a blank note—no setup, no friction. Write fast, sync seamlessly, and extend with workflows.
 
 Branches
 --------
-`main` is the [deployed](https://ScottKirvan.github.io/Quki-Notes/) branch.  The repo doesn't currently contain any other historic or dev branches.
+`main` is the [deployed](https://ScottKirvan.github.io/QuKi-Notes/) branch.  The repo doesn't currently contain any other historic or dev branches.
 
 Repo Layout
 -----------
 ```
-Quki-Notes
-├───_layouts                     # Jekyll layouts for GitHub Pages
-├───.github
-│   ├───gitignore-templates      # Example .gitignore files (Unreal, Unity, Python, etc.)
-│   ├───ISSUE_TEMPLATE           # Bug report and feature request templates
-│   ├───release-please           # Release-Please configuration
-│   ├───workflows                # GitHub Actions (release, template-init)
-│   ├───FUNDING.yml              # Sponsorship configuration
+QuKi-Notes/
+├───lib/                        # Dart application source code
+│   ├───core/                   # Database, GitHub client, sync, settings
+│   ├───features/               # Editor, documents, workflows, onboarding
+│   └───shared/                 # Shared models and widgets
+├───android/                    # Android platform code
+├───windows/                    # Windows platform code
+├───ios/                        # iOS platform code (not actively built)
+├───docs/                       # VitePress documentation source
+├───.github/
+│   ├───workflows/              # CI/CD: tests, builds, releases
+│   ├───ISSUE_TEMPLATE/         # Bug report and feature request templates
 │   └───PULL_REQUEST_TEMPLATE.md # PR template
-├───assets
-│   ├───css                      # Styling for GitHub Pages
-│   └───media                    # Images and logos
-├───notes                        # CHANGELOG, VERSION, TODO
-├───CODE_OF_CONDUCT.md           # Community guidelines
-├───CONTRIBUTING.md              # Contribution guidelines
-├───LICENSE.md                   # MIT License
-└───README.md                    # This file
+├───assets/
+│   ├───css/                    # GitHub Pages styling
+│   └───media/                  # Images and logos
+├───notes/
+│   └───dev/                    # Design docs, specifications, decisions
+├───CODE_OF_CONDUCT.md
+├───CONTRIBUTING.md
+├───LICENSE.md
+├───justfile                    # Task automation
+└───README.md
 ```
 
-### Key Features
+Features
+--------
 
-**GitHub Pages Support**: The `_layouts` and `assets/css` folders enable GitHub Pages rendering with a custom dark theme similar to GitHub's [Dark High Contrast](https://github.blog/changelog/2021-08-25-dark-high-contrast-theme-ga/) theme. Enable Pages in your repo settings - see [GitHub's Jekyll documentation](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll).
-
-**Automated Release Management**: The `.github/workflows` folder includes [Release-Please](https://github.com/googleapis/release-please) for automated versioning and CHANGELOG updates based on conventional commits.
-
-**Template Initialization**: The `template-init.yml` workflow automatically updates repository references when you create a new repo from this template, then deletes itself.
-
-**.gitignore Templates**: The `.github/gitignore-templates/` folder contains ready-to-use `.gitignore` files for Unreal Engine, Unity, Python, Node.js, C++, and general development. See the [templates README](.github/gitignore-templates/) for usage.
-
->[!NOTE]
-> When using this template project, do not clone the tags or branches. Stick with `main` as the name of your main release branch. Change the version number in the `.release-please-manifest.json` file to the version you want to start with.
->
-> Release-Please uses  [Conventional Commits](https://www.conventionalcommits.org/) with [Semantic Versioning](https://semver.org/) (version: MAJOR.MINOR.PATCH). Changes to version numbers are triggered by specific keywords in your commit messages:
-> - `feat:` (new feature) will bump the MINOR version number.
-> - `fix:` (bug fixes) will bump the PATCH number.
-> - `feat!:` `fix!:` or any `xxx!:` (major and breaking changes) will bump the MAJOR version number.
-
->[!TIP]
-> **Automatic Template Initialization**: When you create a new repository from this template, a GitHub Actions workflow automatically runs on your first push to update all repository references, URLs, and badges in the README with your new repository information. The workflow then deletes itself to keep your repo clean. No manual setup required!
-
-
+- **Rapid Capture**: App opens immediately to a blank note—no friction, no setup
+- **Local-First Storage**: Notes stored locally in SQLite; optional GitHub sync for cross-device access
+- **GitHub Sync**: Bi-directional sync with GitHub-hosted repository; conflict resolution via user choice (no merge)
+- **Workflow Integration**: Append notes to external workflows—integrate with daily logs, geotagged captures, or custom destinations
+- **Cross-Platform**: Single Flutter codebase targets Android and Windows; iOS/macOS support deferred
+- **GitHub OAuth**: Secure authentication via Device Flow; no URL scheme registration needed
+- **Markdown Editor**: WYSIWYG interface with formatting toolbar; GitHub Flavored Markdown support
+- **Image Support**: Copy/paste images directly into notes; stored separately and synced via GitHub
+- **Offline-Ready**: Full local operation when GitHub is unavailable; push/pull resume when connectivity returns
 
 Table of Contents
 -----------------
@@ -118,26 +96,21 @@ Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributions / Contact](#contributions--contact)
-- [Credits](#credits)
 
-Features
---------
 Installation
 ------------
+**TBD** — See [Development Setup](notes/dev/dev_env_setup.md) for Flutter/Dart environment configuration.
+
 Usage
 -----
+**TBD** — See [Design Spec](notes/dev/design_spec.md) and [Testing Guide](notes/dev/testing.md) for detailed documentation.
 
 Contributions / Contact
 -----------------------
-- Please [file an issue](https://github.com/ScottKirvan/Quki-Notes/issues/new), or [grab a fork](https://github.com/ScottKirvan/Quki-Notes/fork), hack away, and submit a [pull request](https://github.com/ScottKirvan/Quki-Notes/pulls).
+- Please [file an issue](https://github.com/ScottKirvan/QuKi-Notes/issues/new), or [grab a fork](https://github.com/ScottKirvan/QuKi-Notes/fork), hack away, and submit a [pull request](https://github.com/ScottKirvan/QuKi-Notes/pulls).
 - Contact me at [linkedin.com/in/scottkirvan/](https://www.linkedin.com/in/scottkirvan/)
 - You can also contact me at my [discord](https://discord.gg/TSKHvVFYxB) server, I'm cptvideo.
 
-Credits
--------
-**[ScooterGitTemplate](https://github.com/ScottKirvan/ScooterGitTemplate) Copyright (c) (2025):** [Scott Kirvan](https://github.com/ScottKirvan)  - All rights reserved
-*ScooterGitTemplate is licensed under the [MIT License](LICENSE.md).*
-
-Project Link:  [Quki-Notes](https://github.com/ScottKirvan/Quki-Notes)  
+Project Link:  [QuKi-Notes](https://github.com/ScottKirvan/QuKi-Notes)  
 [CHANGELOG](notes/CHANGELOG.md)  
 [TODO](notes/TODO.md)

@@ -1,6 +1,6 @@
-# Contributing to Quki-Notes
+# Contributing to QuKi-Notes
 
-First off, thank you for considering contributing to Quki-Notes! It's people like you that make this template better for everyone.
+First off, thank you for considering contributing to QuKi-Notes! It's people like you that make this template better for everyone.
 
 ## Code of Conduct
 
@@ -78,7 +78,7 @@ feat!: change template initialization workflow
 ## Project Structure
 
 ```
-Quki-Notes/
+QuKi-Notes/
 ├── .github/
 │   ├── gitignore-templates/  # Example .gitignore files
 │   ├── ISSUE_TEMPLATE/       # Issue templates

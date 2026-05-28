@@ -134,7 +134,8 @@ Queue-based optimistic sync. Local writes are instant (SQLite). Push/pull async.
 3. `notes/dev/decisions.md` — ADR-lite log of every locked decision with rationale and rejected alternatives
 4. `notes/dev/open_questions.md` — unresolved items; resolve in the PR if your task touches one
 5. `notes/dev/session_protocol.md` — start/end-of-session checklist + hard rules
-6. `notes/dev/pr_template.md` — PR title format + body template (use for every PR)
+6. `notes/dev/testing.md` — testing strategy, what must have a test, mandatory bug-fix protocol
+7. `notes/dev/pr_template.md` — PR title format + body template (use for every PR)
 
 `notes/dev/dependencies.md` is the canonical list of approved packages; do not add new runtime dependencies without proposing an ADR first.
 

@@ -1,12 +1,15 @@
 # QuKi — Design Spec
 
+What is a QuKi?  A QuKi is a short note, a picture, a thought, a temporary list, or a rough draft waiting to be copy/pasted or sent elsewhere to become some other type of greater content, or to just be jotted down and left to drift away.  QuKi's live in the moment - their context is the now.  QuKi's don't live in a world where they're saved, treasured, organized, stored, and kept - QuKi's are ephemeral and may or may not become part of some greater idea.
+
+Under the hood, a QuKi is a simple markdown file that can be sync'd across different devices or dispatched off to some other location or project.  You don't have to think about QuKi's - that's something else's job.  The biggest job a QuKi has is temporary.  It's goal is to be that for you, frictionlessly, effortlessly, quickly, and to do so when and where you want, on whatever device you have handy.
 ## Project Overview
 
 A personal writing/notetaking application inspired by iOS Drafts, focusing on rapid capture and workflow integration. The app emphasizes minimal friction—opening directly to a blank note with no assumed formatting.
 
 **Target Platforms** (Priority Order):
 1. Android — active development target
-2. Windows — active development target (after Android)
+2. Windows / Linux — active development target (after Android)
 3. iPadOS / iOS / Mac — codebase supports these via Flutter; builds deferred (macOS GitHub Actions runners cost 10x minutes on Free tier)
 
 The Flutter codebase targets all platforms from the start — no platform-specific rewrites needed later. Deferred platforms just need a build job added and platform testing when ready.
@@ -31,15 +34,17 @@ The Flutter codebase targets all platforms from the start — no platform-specif
 - **Device Sharing**: Native share menu integration (Android share sheet, iPadOS share sheet, Windows share)
 
 ### 2. Note Identification & Titling
-- **Auto-Identification**: Document displayed in manager by first ~50-100 characters (truncated)
-- **Optional Title**: User *can* add a title/topic if desired, but it's optional
-- **Display**: The truncated first line serves as the visual reference in document list
+- **Auto-Identification**: Document displayed in manager by first ~50-100 characters (truncated) from the first line of the note with any characters on it.  If the first two lines of the note are blank, and the 3rd line contains, "abc", the note will be auto-identified with the title, "abc"
+- **Optional Title**: User *can* force the name displayed by adding a title/topic to the first line of the note, but it's optional
+- **Display**: The truncated first line serves as the visual reference in document list -- the names listed may contain duplicates - this is allowed.
 
 ### 3. Document Manager
+The Document Manger is a temporal queue, not a filing cabinet or a way to organize and collect notes -- it surfaces what's current and relevant, letting older notes age off screen. No folders.  There will be basic search, because sometimes memories or thoughts get lost in old notes ("old QuKi's") and need to be recalled, but nothing like integrated tags for grouping and categorizing.
+
 - **CRUD Operations**: Create, read, update, delete notes
-- **Sorting**: Most recent on top (default)
-- **List View**: Shows truncated first line of each note + metadata (date modified, etc.)
-- **No Complex Organization**: Keep it simple—flat list for now
+- **Sorting**: Most recent on top
+- **List View**: Shows truncated first line of each note + metadata (date modified, etc.) - the only way to rename a note is to edit the first line of the note itself
+- **No Complex Organization**: Keep it simple — a flat list
 
 ### 4. Workflow Integration
 - **Workflow Actions**: Append current note to a workflow that can:
@@ -813,7 +818,7 @@ Goal: full Android feature set, polished UX.
 - [ ] Share *from* QuKi to other apps
 - [ ] UI polish: transitions, empty states, loading skeletons
 - [ ] Error handling UX for all error scenarios
-- [ ] Basic testing: unit tests for sync logic, workflow engine, conflict resolution
+- [ ] Phase 4 test audit: review coverage of Phase 1–3 features per `notes/dev/testing.md` → "What must have a test"; backfill anything missing. (Per ADR-13, tests ship with each feature PR — this is a final sweep, not a retrofit.)
 
 ### Phase 5: Windows Port
 Goal: desktop form factor support.

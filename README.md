@@ -44,7 +44,19 @@
 **QuKi-Notes** is a personal capture-and-dispatch app: write ephemeral notes (**QuKis**) frictionlessly on whichever device is at hand, then **toss** them to a destination via a transport plugin. No folders. No tags. No vault. Just capture and move on.
 
 > [!NOTE]
->> This is a **project-in-planning** — very early in development.  Come back to see more, soon :-)  I will be working with Claude-Code on this project - I'm a Sr. software engineer, UX designer, and product manager -- this project will *not* be ai-slop.  All design docs and Claude directives will be included in the project — start with the [manifesto](notes/dev/manifesto.md), then the [design spec](notes/dev/design_spec.md) for the full roadmap to-date.
+> **Status: Phase 0 scaffold — Phase 1 in progress.**
+> I'm a Sr. software engineer, UX designer, and product manager — this project will *not* be ai-slop. All design docs and Claude directives are included in the repo. Start with the [manifesto](notes/dev/manifesto.md), then the [design spec](notes/dev/design_spec.md) for the full roadmap.
+
+## Quick Start (dev)
+
+- Environment setup: [notes/dev/dev_env_setup.md](notes/dev/dev_env_setup.md)
+- Claude context: [CLAUDE.md](CLAUDE.md)
+
+## Design Docs
+
+- [Design spec](notes/dev/design_spec.md)
+- [Decisions (ADR log)](notes/dev/decisions.md)
+- [Open questions](notes/dev/open_questions.md)
 ## Features (MVP — v1.0)
 
 - **Rapid Capture**: App opens immediately to a blank QuKi — no friction, no setup, no "title field"
@@ -73,6 +85,5 @@
 - Contact me at [linkedin.com/in/scottkirvan/](https://www.linkedin.com/in/scottkirvan/)
 - You can also contact me at my [discord](https://discord.gg/TSKHvVFYxB) server, I'm cptvideo.
 
-Project Link:  [QuKi-Notes](https://github.com/ScottKirvan/QuKi-Notes)  
-[CHANGELOG](notes/CHANGELOG.md)  
-[TODO](notes/TODO.md)
+Project Link: [QuKi-Notes](https://github.com/ScottKirvan/QuKi-Notes)
+[CHANGELOG](CHANGELOG.md)

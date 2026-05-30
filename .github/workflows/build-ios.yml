@@ -1,0 +1,14 @@
+# iOS build is deferred — macOS GitHub Actions runner cost.
+# See CLAUDE.md for details. Trigger is workflow_dispatch only; no tag trigger.
+name: Build iOS (deferred)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deferred
+        run: echo "iOS build deferred — see CLAUDE.md"

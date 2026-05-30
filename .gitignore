@@ -1,3 +1,42 @@
+# Pre-existing vault/project ignores
 .obsidian/*
 .claude/
 zz_*
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+**/doc/api/
+**/ios/Flutter/.last_build_id
+app.*.symbols
+app.*.map.json
+
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Android build artifacts
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Coverage
+coverage/
+
+# macOS
+**/.DS_Store
+
+# VS Code (user-local launch config only; settings.json is committed)
+.vscode/launch.json
+
+# VitePress
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+docs/node_modules/

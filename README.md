@@ -1,4 +1,4 @@
-# QuKi-Notes [![starline](https://starlines.qoo.monster/assets/ScottKirvan/QuKi-Notes)](https://github.com/qoomon/starline)
+	1`q# QuKi-Notes [![starline](https://starlines.qoo.monster/assets/ScottKirvan/QuKi-Notes)](https://github.com/qoomon/starline)
 <div align="center">
 
   <img src="assets/media/logo.jpg" alt="logo" width="200" height="auto" />
@@ -41,21 +41,20 @@
   </h4>
 </div>
 
-**QuKi-Notes** is a rapid note-capture application inspired by iOS Drafts, designed for quick, frictionless writing with powerful GitHub integration and cross-device syncing. The app opens immediately to a blank note—no setup, no friction. Write fast, sync seamlessly, and extend with workflows.
+**QuKi-Notes** is a personal capture-and-dispatch app: write ephemeral notes (**QuKis**) frictionlessly on whichever device is at hand, then **toss** them to a destination via a transport plugin. No folders. No tags. No vault. Just capture and move on.
 
 > [!NOTE]
->> This is a **project-in-planning** - very early in development.  Come back to see more, soon :-)  I will be working with Claude-Code on this project - I'm an Sr. software engineer, UX designer, and product manager -- this project will *not* be ai-slop.  All design docs and Claude directives will be included in the project -- see [design_spec](07_GitRepos/ScottKirvan/Quki-Notes/notes/dev/design_spec.md) for the projects full roadmap and design plan to-date.
-## Features
+>> This is a **project-in-planning** — very early in development.  Come back to see more, soon :-)  I will be working with Claude-Code on this project - I'm a Sr. software engineer, UX designer, and product manager -- this project will *not* be ai-slop.  All design docs and Claude directives will be included in the project — start with the [manifesto](notes/dev/manifesto.md), then the [design spec](notes/dev/design_spec.md) for the full roadmap to-date.
+## Features (MVP — v1.0)
 
-- **Rapid Capture**: App opens immediately to a blank note—no friction, no setup
-- **Local-First Storage**: Notes stored locally in SQLite; optional GitHub sync for cross-device access
-- **GitHub Sync**: Bi-directional sync with GitHub-hosted repository; conflict resolution via user choice (no merge)
-- **Workflow Integration**: Append notes to external workflows—integrate with daily logs, geotagged captures, or custom destinations
-- **Cross-Platform**: Single Flutter codebase targets Android and Windows; iOS/macOS support deferred
-- **GitHub OAuth**: Secure authentication via Device Flow; no URL scheme registration needed
-- **Markdown Editor**: WYSIWYG interface with formatting toolbar; GitHub Flavored Markdown support
-- **Image Support**: Copy/paste images directly into notes; stored separately and synced via GitHub
-- **Offline-Ready**: Full local operation when GitHub is unavailable; push/pull resume when connectivity returns
+- **Rapid Capture**: App opens immediately to a blank QuKi — no friction, no setup, no "title field"
+- **Local-First Storage**: All QuKis stored locally in SQLite. Single-device by default; sync is an opt-in plugin (v1.1+).
+- **QuKi-Toss (Transport Plugins)**: User-initiated dispatch — copy to clipboard, push to a share sheet, append to a GitHub file, or whatever a plugin implements. Dart-only.
+- **Ephemeral by Framing**: Newest-first stream surfaces what's current; older QuKis age off-screen but stay searchable. Nothing auto-deletes.
+- **Cross-Platform**: Single Flutter codebase actively targeting Android, Windows, and Linux. iOS/iPadOS/macOS supported by the codebase; CI builds deferred.
+- **Markdown Editor**: WYSIWYG interface with formatting toolbar; GFM under the hood.
+- **Image Support**: Copy/paste images directly into QuKis; stored separately on disk and referenced from markdown.
+- **No Telemetry**: No analytics, no crash reporting, no tracking.
 
 ## Table of Contents
 - [Features](#features)

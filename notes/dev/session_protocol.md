@@ -5,6 +5,7 @@ What to do at the **start** and **end** of every implementation session, and the
 ## At session start
 
 1. **Read in this order:**
+   - `notes/dev/manifesto.md` — normative philosophy + tonality (load-bearing)
    - `CLAUDE.md` (repo root) — high-level context + locked decisions table
    - `notes/dev/design_spec.md` — full spec; jump to the section relevant to today's task
    - `notes/dev/decisions.md` — rationale behind every locked decision; do not relitigate without discussing with Scott
@@ -41,18 +42,22 @@ What to do at the **start** and **end** of every implementation session, and the
 
 | Rule | Source |
 |---|---|
-| OAuth token lives in `flutter_secure_storage`, never in `shared_preferences` or files | ADR-2 |
-| Workflow target file SHAs are always re-fetched, never cached | ADR-7 |
-| Images are lazy-fetched on note open, never bulk-downloaded | ADR-11 |
-| No analytics, no crash reporting, no telemetry SDK | ADR-12 |
+| Manifesto is normative. If a request conflicts with the manifesto, push back before implementing. | `manifesto.md` |
+| No vault-like features (folders, tags, backlinks, archive, pinning). | `manifesto.md` "Is NOT" list |
+| `lib/core/` and `lib/shared/models/` stay Flutter-free. Flutter imports go in `lib/ui/` / `lib/features/`. | ADR-16 |
+| Any plugin secret (OAuth token, API key) lives in `flutter_secure_storage`, namespaced per plugin. Never in `shared_preferences`, files, or source. | ADR-2 |
+| No analytics, no crash reporting, no telemetry SDK. Ever. | ADR-12 |
 | `build-ios.yml` is a stub and must NOT be wired to trigger automatically | CLAUDE.md |
-| OAuth tokens and full note contents are never logged | ADR-12 |
-| Image base64-embedding in markdown is forbidden | ADR-4 |
-| `deletedAt` is the only correct way to delete a note; do not hard-delete a synced note directly | ADR-5 |
-| Save and Push are separate; only the 2s idle debounce, foreground, and manual button trigger push | ADR-6 |
+| Plugin secrets and full QuKi contents are never logged. | ADR-12 |
+| Image base64-embedding in markdown is forbidden. Images are separate binary files referenced as `![](../images/...)`. | ADR-4 |
+| `deletedAt` is the only correct way to delete a QuKi. Background sweep hard-deletes after 24h in MVP. | ADR-5 |
+| Save (local) and Toss (transport) are separate. Toss is **always** user-initiated. No auto-toss. | ADR-6, ADR-14 |
 | Tests ship with the code in every feature PR — not retrofitted later | ADR-13 |
 | Bug fixes: failing regression test **first**, verify it fails, then write the fix | ADR-13 |
 | Flaky tests are tagged and fixed within one session — never left to accumulate | ADR-13 |
+| No new runtime dependency without proposing an ADR first. | `decisions.md` rule |
+| Transports are Dart-only. No JS/TS/Lua/embedded interpreters. (Obsidian glue is a separate repo.) | ADR-14 |
+| Sync and MCP code does **not** land in MVP. `core/sync/` and `core/mcp/` directories do not exist yet. | ADR-17, ADR-18 |
 
 ## Tooling expectations
 

@@ -1,39 +1,59 @@
-# QuKi — Claude Context
+# QuKi-Notes — Claude Context
 
 ## What This Is
 
-A personal writing/notetaking app inspired by iOS Drafts. Rapid capture first — app opens to a blank note, no friction. Notes sync across devices via GitHub. Workflows deliver notes to other destinations (e.g. daily log in a separate repo).
+A personal **capture-and-dispatch** app: ephemeral notes (**QuKis**) captured frictionlessly on whichever device is at hand, then **tossed** to a destination via a transport plugin. No vault. No organisation. No backup ritual.
+
+**Philosophy first.** Read `notes/dev/manifesto.md` before anything else. The manifesto is normative; this file and the spec must stay consistent with it.
 
 **Design phase: complete.** Full spec at `notes/dev/design_spec.md`.
-**Next phase: Phase 1 implementation** — local capture on Android.
+**Next phase: Phase 1 implementation** — local capture + first transport plugin on Android.
+
+---
+
+## The Three Plugin Axes (load-bearing)
+
+QuKi-Notes is a **capture + dispatch** app with three independent plugin layers:
+
+| Layer                        | What it does                                                                       | MVP                                            |
+| ---------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------- |
+| **Transports** (QuKi-Tosses) | Take a QuKi (markdown + images) → deliver to a destination. Stateless per fire.    | Yes — at least one built-in.                   |
+| **Sync**                     | Move QuKis across this user's own devices. Opt-in. Off by default.                 | No — v1.1+ (skeleton lands with first plugin). |
+| **MCP**                      | Expose QuKi-Notes read/list/append/toss to AI agents over Model Context Protocol.  | No — v2.0+ (axis reserved, not built).         |
+
+All plugins are **Dart-only**. Obsidian compatibility (if/when built) lives in a separate TypeScript glue plugin in its own repo, talking to a Dart-shaped endpoint exposed by QuKi-Notes.
+
+Core app responsibility: plugin management + the editor + the stream + file plumbing for plugins to consume. Plugins do the dispatching/syncing work.
 
 ---
 
 ## Key Decisions (all locked)
 
+See `notes/dev/decisions.md` for full ADR rationale. Summary:
+
 | Decision                  | Choice                                                                                                                                                              |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Framework                 | Flutter (Dart)                                                                                                                                                      |
 | State management / DI     | `riverpod` + `riverpod_generator` (code-gen, `@riverpod`)                                                                                                           |
-| Active platforms          | Android first, then Windows                                                                                                                                         |
+| Active platforms          | Android first, then Windows + Linux                                                                                                                                 |
 | Deferred platforms        | iPadOS / iOS / Mac (codebase supports; builds deferred — macOS runner cost)                                                                                         |
 | Markdown flavor           | GFM                                                                                                                                                                 |
 | WYSIWYG editor            | `super_editor` (fallback: `appflowy_editor`)                                                                                                                        |
 | Local storage             | `drift` (SQLite ORM)                                                                                                                                                |
-| GitHub API client         | `dio` + `github` Dart package                                                                                                                                       |
-| Auth                      | GitHub OAuth 2.0 — **Device Flow** on all platforms (scopes: `repo`, `read:user`); no URL scheme registration                                                       |
-| Token storage             | `flutter_secure_storage` (OS keystore — never `shared_preferences`)                                                                                                 |
-| Note IDs / filenames      | UUID v4 (`uuid` package); GitHub path `notes/YYYY-MM-DD-{uuid8}.md` (first 8 hex chars of id)                                                                       |
-| Image storage             | Separate binary files in `images/YYYY-MM-DD-{uuid8}.{ext}`; markdown ref `![](../images/...)`; never base64-embedded                                                |
-| Deletion model            | Soft-delete via `deletedAt` column → hard-delete on successful remote DELETE; remote-side deletions out of scope for MVP                                            |
-| Save vs push              | Save (local SQLite) and push (GitHub) are separate. Save: 2s debounce + 30s periodic + lifecycle paused/detached. Push: 2s idle debounce + foreground + manual only |
-| Workflow target SHAs      | Always re-fetch at execution time (never cached); 409 → retry read-modify-write once                                                                                |
+| Sync (MVP)                | **None.** Opt-in plugin axis lands v1.1+ (ADR-17, ADR-18)                                                                                                           |
+| Transports (MVP)          | At least one built-in QuKi-Toss plugin (ADR-14)                                                                                                                     |
+| MCP                       | Reserved as third plugin axis; **no code** in v1 (ADR-14, ADR-18)                                                                                                   |
+| Auth                      | None in MVP. When needed by a plugin: GitHub OAuth 2.0 — Device Flow on all platforms (scopes per-plugin); no URL scheme registration                                |
+| Token storage             | `flutter_secure_storage` (OS keystore), namespaced per plugin                                                                                                       |
+| QuKi IDs / filenames      | UUID v4 (`uuid` package); transport-derived path `YYYY-MM-DD-{uuid8}.md` only when a plugin needs it                                                                |
+| Image storage             | Separate binary files in `<app docs>/images/YYYY-MM-DD-{uuid8}.{ext}`; markdown ref `![](../images/...)`; never base64-embedded                                     |
+| Deletion model            | Soft-delete via `deletedAt`; MVP background sweep at 24h. Sync-aware delete arrives with first sync plugin.                                                         |
+| Save vs toss              | Save (local SQLite): 2s debounce + 30s periodic + lifecycle paused/detached. Toss (transport): manual only, user-initiated. No auto-toss, ever.                     |
+| Ephemerality              | Gmail-style: framed as ephemeral via newest-first stream + no folders; persisted forever locally; no auto-delete (ADR-15)                                           |
+| CLI                       | Working hypothesis only — not in MVP. Architecture preserves option (ADR-16, `notes/dev/cli_design.md`)                                                             |
 | Drift migrations          | Integer `schemaVersion` + `MigrationStrategy.onUpgrade`; schema snapshots in `test/db/schemas/`; migration test required per version bump                           |
-| Cross-device timestamps   | On pull: `createdAt` derived from filename date prefix; `modifiedAt` = pull time; fresh local UUID for `id`; `githubPath` captured verbatim                         |
-| Rate limiting             | Honour `X-RateLimit-Remaining` (<100 → pause until reset); newest-first note pull; images lazy-fetched on first view                                                |
 | Theme / Logging / Privacy | Follow system theme; `logging` package (console in debug, in-memory ring buffer in release); **no analytics, no crash reporting**                                   |
-| Conflict resolution       | SHA-based; user picks version (no merge)                                                                                                                            |
-| Workflow engine           | In-app JSON DSL; workflows stored as files in GitHub repo                                                                                                           |
+| Workflow JSON DSL         | **Dropped.** Replaced by transport plugins (Dart code). ADR-7 superseded by ADR-14.                                                                                 |
 | Versioning                | Semantic versioning via release-please (`dart` type)                                                                                                                |
 | Commits                   | Conventional commits; squash merge; PR title = commit message                                                                                                       |
 | Task runner               | `just` (justfile)                                                                                                                                                   |
@@ -46,15 +66,20 @@ A personal writing/notetaking app inspired by iOS Drafts. Rapid capture first �
 ```
 QuKi-Notes/
 ├── lib/
-│   ├── core/         ← database/, github/, sync/, settings/
-│   ├── features/     ← editor/, documents/, workflows/, onboarding/, settings/
-│   └── shared/       ← models/, widgets/
+│   ├── main.dart
+│   ├── app.dart
+│   ├── core/         ← database/, transports/, auth/, settings/  (sync/, mcp/ added when those axes ship)
+│   ├── features/     ← editor/, stream/, onboarding/, settings/
+│   ├── ui/           ← cross-cutting Flutter widgets (NOT importable from CLI)
+│   └── shared/       ← models/  (pure Dart; CLI-safe)
+├── bin/              ← quki.dart  (added when CLI work begins; pure Dart console)
 ├── android/
-├── ios/              ← present but not actively built
 ├── windows/
+├── linux/
+├── ios/              ← present but not actively built
 ├── docs/             ← VitePress source
 ├── .github/
-│   ├── workflows/    ← ci.yml, build-android.yml, build-windows.yml, build-ios.yml (stub), docs.yml
+│   ├── workflows/    ← ci.yml, build-android.yml, build-windows.yml, build-linux.yml, build-ios.yml (stub), docs.yml
 │   └── release-please.yml
 └── justfile
 ```
@@ -71,57 +96,51 @@ Claude opens focused PRs (one logical unit each). Scott tests on device and merg
 2. CI runs (`flutter analyze`, `flutter test`)
 3. Scott tests on Android, squash merges
 4. release-please accumulates commits → opens Release PR when ready
-5. Scott merges Release PR → GitHub Release created → build workflows fire (APK + Windows)
+5. Scott merges Release PR → GitHub Release created → build workflows fire (APK + Windows + Linux)
 
-**Branch naming**: `feat/phase1-drift-schema`, `fix/sync-conflict-409`
+**Branch naming**: `feat/phase1-drift-schema`, `fix/toss-retry-network`
 **PR size**: one screen, one service, or one action type — small enough to test in a session
 
 ---
 
 ## Development Pipeline Summary
 
-| Phase | Goal                                           | Status      |
-| ----- | ---------------------------------------------- | ----------- |
-| 1     | Local capture on Android (no sync)             | Not started |
-| 2     | GitHub sync (push/pull, conflict resolution)   | Not started |
-| 3     | Workflow engine (daily log, geotagged entries) | Not started |
-| 4     | Sharing + Polish (Android complete)            | Not started |
-| 5     | Windows port                                   | Not started |
-| 6     | iPadOS / iOS / Mac (deferred)                  | Deferred    |
+| Phase | Goal                                                              | Status      |
+| ----- | ----------------------------------------------------------------- | ----------- |
+| 0     | Bootstrap scaffold (project, CI, docs)                            | Not started |
+| 1     | Local QuKi capture on Android (editor + stream + drift)           | Not started |
+| 2     | Transport plugin loader + first built-in QuKi-Toss                | Not started |
+| 3     | Polish + share-in + Windows + Linux ports                         | Not started |
+| 4     | Sync plugin axis + first sync backend (likely GitHub)             | v1.1+       |
+| 5     | iPadOS / iOS / Mac builds                                         | Deferred    |
+| 6     | MCP plugin axis                                                   | v2.0+       |
 
 ---
 
-## Workflow System — Key Concepts
+## Transport (QuKi-Toss) — Key Concepts
 
-- Workflows are **delivery actions** — notes stay in QuKi AND are sent to a destination
-- Workflow definitions are JSON files in `/workflows/` of the GitHub repo — sync to all devices automatically
-- Core action: `append_to_github_file` — read-modify-write to a dated file in **any** authorized GitHub repo (not just the notes repo)
-- Two entry formats: **plain** (`---` + text) and **geotagged** (`---` + address + maps URL + altitude + text)
-- Real-world example: `sk/02_Calendar/Daily/in/{{date}}_in.md` in `ScottKirvan/Vaults`
-- GPS via `geolocator`; reverse geocoding via `geocoding` (platform-native, no API key)
-
----
-
-## GitHub Repo Structure (runtime)
-
-```
-{notes_repo}/
-├── notes/        ← YYYY-MM-DD-{uuid8}.md (one file per note; uuid8 = first 8 hex chars of note's UUID v4)
-├── images/       ← YYYY-MM-DD-{uuid8}.{ext} (binaries — png/jpg/gif/webp; referenced from notes as ../images/...)
-└── workflows/    ← daily-log.json, daily-log-geo.json, etc.
-```
+- A **QuKi-Toss** is a transport plugin: takes `(markdown, images, context)` → returns `success` or `failure(reason, retryable)`.
+- Tosses are **stateless per fire**. They don't track history; the QuKi stays in the local stream after a successful toss.
+- Tosses are **user-initiated**. No auto-toss in MVP.
+- Plugin interface in `lib/core/transports/`. See ADR-14 for the API shape.
+- First built-in toss: TBD at Phase 2 kickoff (candidates: clipboard, share-sheet, append-to-GitHub-file). Decision lives in `open_questions.md`.
 
 ---
 
-## Sync Model (summary)
+## Sync (Plugin Axis — Deferred)
 
-Queue-based optimistic sync. Local writes are instant (SQLite). Push/pull async.
+- Sync is **one of three plugin axes**, not a built-in feature. ADR-17.
+- `lib/core/sync/` skeleton lands with the **first** sync plugin, not in MVP.
+- When the GitHub sync plugin ships (likely the first), it inherits the "save vs push" debounce model (formerly ADR-6) and the SHA-based conflict-resolution pattern (formerly ADR-7), but as plugin internals, not core behaviour.
 
-- `sync_status` per note: `synced` | `pending_push` | `conflict` | `error`
-- Push triggered: after auto-save debounce (~2s), on foreground, on manual sync
-- Pull triggered: on launch, on foreground after >5 min, on manual sync
-- Conflict: GitHub 409 → fetch remote → user picks version → push with current SHA
-- UI: persistent cloud icon with state; never blocks writing
+---
+
+## Ephemerality (Gmail-Style)
+
+- Newest-first stream surfaces what's current.
+- Older QuKis age off the top but remain in SQLite + searchable.
+- Tossing copies a QuKi to its destination; the local QuKi stays in the stream.
+- Only the user can delete (no auto-expire in MVP). See ADR-15.
 
 ---
 
@@ -129,15 +148,18 @@ Queue-based optimistic sync. Local writes are instant (SQLite). Push/pull async.
 
 **Required reading at session start** (in order):
 
-1. This file — high-level context + locked decisions table above
-2. `notes/dev/design_spec.md` — full design spec (jump to the section relevant to today's task)
-3. `notes/dev/decisions.md` — ADR-lite log of every locked decision with rationale and rejected alternatives
-4. `notes/dev/open_questions.md` — unresolved items; resolve in the PR if your task touches one
-5. `notes/dev/session_protocol.md` — start/end-of-session checklist + hard rules
-6. `notes/dev/testing.md` — testing strategy, what must have a test, mandatory bug-fix protocol
-7. `notes/dev/pr_template.md` — PR title format + body template (use for every PR)
+1. `notes/dev/manifesto.md` — QuKi philosophy + tonality (normative)
+2. This file — high-level context + locked decisions table above
+3. `notes/dev/design_spec.md` — full design spec (jump to the section relevant to today's task)
+4. `notes/dev/decisions.md` — ADR-lite log of every locked decision with rationale and rejected alternatives
+5. `notes/dev/open_questions.md` — unresolved items; resolve in the PR if your task touches one
+6. `notes/dev/session_protocol.md` — start/end-of-session checklist + hard rules
+7. `notes/dev/testing.md` — testing strategy, what must have a test, mandatory bug-fix protocol
+8. `notes/dev/pr_template.md` — PR title format + body template (use for every PR)
 
 `notes/dev/dependencies.md` is the canonical list of approved packages; do not add new runtime dependencies without proposing an ADR first.
+
+`notes/dev/cli_design.md` is a working hypothesis for a future CLI — read only if you're touching `lib/core/` structure (to preserve CLI-importability).
 
 **First session only:** `notes/dev/bootstrap.md` contains the step-by-step task list for the **Phase 0 scaffold PR** (project structure, pubspec, justfile, CI workflows, VitePress). Read it once at the very first session; after the bootstrap PR is merged it becomes reference-only.
 
@@ -145,15 +167,17 @@ Queue-based optimistic sync. Local writes are instant (SQLite). Push/pull async.
 
 **Hard rules** (full list in `session_protocol.md`):
 
+- The manifesto is normative. If a request conflicts with the manifesto, push back before implementing.
+- Do not introduce vault-like features (folders, tags, backlinks). See manifesto "Is NOT" list.
 - Do not commit or push without explicit instruction from Scott
 - Open one PR per logical unit; include clear test instructions using `pr_template.md`
 - Use conventional commit PR titles; Scott will squash merge
 - `just gen` must be run after any drift schema change; migration test required for version bumps
 - `build-ios.yml` exists as a stub but must NOT be wired to trigger — macOS runner cost
-- The `geocoding` package uses platform-native geocoding — no API key needed
 - No analytics, no crash reporting, no telemetry SDKs — ever (see ADR-12)
-- OAuth tokens and full note contents are never logged
+- OAuth tokens and full QuKi contents are never logged
+- `lib/core/` and `lib/shared/models/` must stay Flutter-free (ADR-16, for future CLI). Flutter imports go in `lib/ui/` or `lib/features/`.
 
 ---
 
-**Last Updated**: May 26, 2026
+**Last Updated**: 2026-05-28

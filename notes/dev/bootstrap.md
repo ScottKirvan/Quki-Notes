@@ -10,17 +10,17 @@ Goal: a single PR that lands a green-CI scaffold matching `design_spec.md`'s Pro
 
 ## Pre-flight (do these in order, stop if any fail)
 
-1. **Read all required-reading docs** listed in `CLAUDE.md` → "Notes for Implementation Claude". Especially `design_spec.md` → Project Structure, Tech Stack, Development Workflow, and `dependencies.md` for the full package list.
+1. **Read `manifesto.md` first**, then the rest of the required-reading list in `CLAUDE.md` → "Notes for Implementation Claude". Especially `design_spec.md` → Project Structure, Tech Stack, Phases, and `dependencies.md` for the full package list.
 
 2. **Verify Scott has done the setup:**
    - `flutter --version` works
-   - `flutter doctor` is green (Android device + Windows desktop)
+   - `flutter doctor` is green (Android device + Windows desktop; Linux desktop is a nice-to-have at bootstrap, required by Phase 3)
    - `gh auth status` shows logged-in
    - `just --version` works
    - The empty repo exists on GitHub and is cloned locally as the working directory
 
 3. **Confirm with Scott:**
-   - The GitHub OAuth App `client_id` (or that it's still TBD — see `open_questions.md` OQ-3). For bootstrap, a constant placeholder is fine; we'll resolve OQ-3 before Phase 2.
+   - **No GitHub OAuth `client_id` needed at bootstrap** — MVP has no OAuth (ADR-9 deferred). Skip OQ-3 discussion until Phase 4 (sync) or whenever the first OAuth-needing transport ships.
    - The `--org` reverse-DNS prefix for Android/iOS bundle IDs. **Default proposal: `com.quki`** → bundle ID will be `com.quki.quki_notes`. Confirm or override.
 
 4. **Branch:**
@@ -41,22 +41,22 @@ From repo root (where `notes/`, `CLAUDE.md`, `.editorconfig` already live):
 
 ```bash
 flutter create . \
-  --platforms=android,windows,ios,macos \
+  --platforms=android,windows,linux,ios,macos \
   --org com.quki \
   --project-name quki_notes \
-  --description "Personal writing/notetaking app inspired by iOS Drafts."
+  --description "QuKi-Notes — capture and toss ephemeral notes."
 ```
 
-This adds `lib/`, `android/`, `windows/`, `ios/`, `macos/`, `test/`, `pubspec.yaml`, etc. alongside the existing planning docs.
+This adds `lib/`, `android/`, `windows/`, `linux/`, `ios/`, `macos/`, `test/`, `pubspec.yaml`, etc. alongside the existing planning docs.
 
-iOS and macOS scaffolds are created so the codebase compiles for them; they're **not** wired to CI per `CLAUDE.md`.
+iOS and macOS scaffolds are created so the codebase compiles for them; they're **not** wired to CI per `CLAUDE.md`. Linux is active (Phase 3 target) and **is** wired to CI.
 
 ### Step 2 — Configure `pubspec.yaml`
 
 Replace the generated file. Use `dependencies.md` as the source of truth for which packages belong in Phase 1. Concretely:
 
 - `name: quki_notes`
-- `description: Personal writing/notetaking app inspired by iOS Drafts.`
+- `description: QuKi-Notes — capture and toss ephemeral notes.`
 - `publish_to: 'none'`
 - `version: 0.1.0+1`
 - `environment.sdk: '>=3.5.0 <4.0.0'` (or current stable)
@@ -78,30 +78,31 @@ Match `design_spec.md` → Project Structure exactly:
 lib/
 ├── main.dart
 ├── app.dart
-├── core/
+├── core/                ← MUST remain Flutter-free (ADR-16)
 │   ├── database/
-│   ├── github/
-│   ├── sync/
+│   ├── transports/
+│   ├── auth/
 │   └── settings/
 ├── features/
 │   ├── editor/
-│   ├── documents/
-│   ├── workflows/
+│   ├── stream/
 │   ├── onboarding/
 │   └── settings/
+├── ui/                  ← cross-cutting Flutter widgets, theme
 └── shared/
-    ├── models/
-    └── widgets/
+    └── models/          ← pure Dart (CLI-safe per ADR-16)
 ```
 
 Add a `.gitkeep` in each empty directory so they survive the commit.
+
+`core/sync/` and `core/mcp/` are **not** created at bootstrap — they land with their respective plugin axes in v1.1+ and v2.0+ respectively. Creating empty stubs would be premature and conflict with manifesto framing.
 
 ### Step 4 — Minimal "hello world" app
 
 Replace the generated `lib/main.dart` and add `lib/app.dart`:
 
-- `main.dart`: standard `void main() { runApp(ProviderScope(child: QuKiApp())); }`
-- `app.dart`: `ConsumerWidget` named `QuKiApp` returning a `MaterialApp` with `themeMode: ThemeMode.system` (per ADR-12), a light + dark theme, and a `Scaffold` with the text "QuKi — Phase 0 scaffold".
+- `main.dart`: standard `void main() { runApp(ProviderScope(child: QuKiNotesApp())); }`
+- `app.dart`: `ConsumerWidget` named `QuKiNotesApp` returning a `MaterialApp` with `themeMode: ThemeMode.system` (per ADR-12), a light + dark theme, and a `Scaffold` with the text "QuKi-Notes — Phase 0 scaffold".
 
 This proves Riverpod is wired, theme works, and the app boots. **Do not implement any actual features in this PR** — that's Phase 1.
 
@@ -118,6 +119,9 @@ android:
 
 windows:
     flutter run -d windows
+
+linux:
+    flutter run -d linux
 
 test:
     flutter test
@@ -137,6 +141,9 @@ build-android-release:
 
 build-windows:
     flutter build windows --release
+
+build-linux:
+    flutter build linux --release
 
 docs:
     cd docs && npm run dev
@@ -159,6 +166,11 @@ Create:
 **`build-windows.yml`** — same trigger:
 - Runner: `windows-latest`
 - Output: zipped Windows release build → attached to GitHub Release
+
+**`build-linux.yml`** — same trigger:
+- Runner: `ubuntu-latest`
+- Output: tarball of the linux release build → attached to GitHub Release. (Final distribution format — AppImage / Flatpak / Snap — deferred to OQ-NEW-3 at Phase 3.)
+- Build deps: `clang`, `cmake`, `ninja-build`, `pkg-config`, `libgtk-3-dev`, `liblzma-dev`, `libsecret-1-dev` (for `flutter_secure_storage`).
 
 **`build-ios.yml`** — stub:
 - Trigger: `workflow_dispatch` **only** (manual). No tag trigger. Leave a top comment explaining it's deferred per `CLAUDE.md`.
@@ -214,8 +226,9 @@ docs/
 ```bash
 just lint               # flutter analyze + dart format check
 just test               # flutter test (the generated default widget test)
-just android            # Pixel boots the scaffold; shows "Phase 0 scaffold"
+just android            # Pixel boots the scaffold; shows "QuKi-Notes — Phase 0 scaffold"
 just windows            # Windows desktop window opens with the same text
+# just linux            # only if Scott has a Linux env handy; otherwise rely on CI
 cd docs && npm run docs:build && cd ..   # VitePress builds clean
 ```
 
@@ -240,12 +253,12 @@ Use `pr_template.md` for the PR body. Test instructions = the §10 verification 
 ## Acceptance criteria
 
 - [ ] CI workflow (`ci.yml`) runs and is **green** on the PR
-- [ ] App boots on Pixel 6 Pro showing the "Phase 0 scaffold" text
+- [ ] App boots on Pixel 6 Pro showing the scaffold text
 - [ ] App boots on Windows desktop showing the same text
-- [ ] `lib/` folder tree matches `design_spec.md` → Project Structure
+- [ ] `lib/` folder tree matches `design_spec.md` → Project Structure (no `core/sync/`, no `core/mcp/`)
 - [ ] `pubspec.yaml` declares every Phase 1 runtime + dev dependency from `dependencies.md`
-- [ ] `justfile` has all recipes listed in Step 5
-- [ ] All five build/CI workflows exist; `build-ios.yml` has only a `workflow_dispatch` trigger
+- [ ] `justfile` has all recipes listed in Step 5 (including `linux`)
+- [ ] All six build/CI workflows exist (`ci`, `build-android`, `build-windows`, `build-linux`, `build-ios` stub, `docs`); `build-ios.yml` has only a `workflow_dispatch` trigger
 - [ ] release-please workflow exists and is configured for `dart`
 - [ ] VitePress builds clean
 - [ ] No features implemented — this is structure only
@@ -255,8 +268,10 @@ Use `pr_template.md` for the PR body. Test instructions = the §10 verification 
 ## What this PR does NOT do (deferred to Phase 1+)
 
 - No drift schema (Phase 1, separate PR)
-- No GitHub OAuth (Phase 2)
-- No workflow engine (Phase 3)
+- No editor, no stream (Phase 1)
+- No transports (Phase 2)
+- No sync, no OAuth (Phase 4+)
+- No MCP (v2.0+)
 - No real UI beyond a placeholder Scaffold
 - No real tests beyond the generated default widget test
 
@@ -268,5 +283,5 @@ If any of these creep in during bootstrap: stop and split.
 
 1. Scott squash-merges. The conventional commit `chore: bootstrap project scaffold` lands on `main`.
 2. release-please opens its first Release PR (will sit dormant until `feat:` commits accumulate).
-3. Phase 1 begins in the next session — start with the drift schema PR per `design_spec.md` → Phase 1 task list.
+3. Phase 1 begins in the next session — start with the **drift schema v1** PR per `design_spec.md` → Phase 1 task list (`qukis` + `images` tables, no sync columns yet).
 4. This bootstrap doc is now reference-only. Do not edit it; if the scaffold needs changes, open a follow-up PR with its own commit message.

@@ -15,7 +15,7 @@ Do not implement past one of these without proposing a resolution in the PR body
 **Resolution options:**
 - (a) Extend `super_editor` with missing serializers
 - (b) Restrict the toolbar to features that survive round-trip
-- (c) Fall back to `appflowy_editor` (already named as the secondary option in the design spec)
+- (c) Fall back to `appflowy_editor`
 
 **Test plan when reached:** write a small fixture for each GFM feature, serialize → deserialize → compare AST.
 
@@ -26,7 +26,7 @@ Do not implement past one of these without proposing a resolution in the PR body
 The Image Handling section assumes the editor renders `![](../images/{file})` references by resolving each one to a local file path via the `images` table. The exact integration point in `super_editor` (custom image node? markdown post-processor? widget builder?) is to be confirmed during Phase 1 implementation.
 
 **Constraints:**
-- Must support lazy fetch (placeholder while `localPath` is null)
+- Must support lazy fetch (placeholder while `localPath` is null) — relevant once a sync plugin can populate image rows ahead of file download
 - Must support insertion via paste handler
 - Must serialize back to the canonical `![](../images/...)` markdown form on save
 
@@ -34,44 +34,92 @@ The Image Handling section assumes the editor renders `![](../images/{file})` re
 
 ---
 
-## OQ-3: GitHub OAuth App `client_id` distribution
+## OQ-3: GitHub OAuth App `client_id` distribution (deferred)
 
-Scott registers a GitHub OAuth App and captures the `client_id`. Where does it live in source?
+Defers to whichever plugin first needs GitHub OAuth (likely the GitHub sync plugin in Phase 4, or a GitHub-flavoured transport before that).
 
-- (a) Committed as a constant — simple, but ties the open-source repo to one specific OAuth App if the repo ever goes public
-- (b) Injected via `--dart-define=QUKI_CLIENT_ID=...` at build time — cleaner, requires CI secret + local `.env`
-- (c) Read from `assets/config.json` at runtime — extra plumbing, no real benefit over (b)
+When that PR lands, decide:
 
-`client_id` is not secret per the OAuth spec (it's exposed during the auth flow regardless), so (a) is acceptable. Decide based on whether the repo will ever go public.
+- (a) Committed as a constant in the plugin
+- (b) Injected via `--dart-define=QUKI_GH_CLIENT_ID=...` at build time
+- (c) Read from `assets/config.json` at runtime
 
-**Surface during:** Phase 2, OAuth implementation.
+`client_id` is not secret per the OAuth spec; (a) is acceptable unless the repo goes public AND a different OAuth App is needed per fork.
 
----
-
-## OQ-4: Initial-sync progress UX threshold
-
-The Rate Limiting section specifies a "Syncing N of M" banner during bulk pull. Should it appear:
-
-- Always (even for M = 2)?
-- Only when M > some threshold (e.g. 20)?
-- Only when sync exceeds a wall-clock duration (e.g. 3 seconds)?
-
-**Surface during:** Phase 2, initial-sync implementation.
-
-**Likely resolution:** time-based — show banner if sync hasn't completed within 1–2 seconds. UI-side decision, low risk.
+**Surface during:** First PR that introduces an OAuth-needing plugin.
 
 ---
 
-## OQ-5: Workflow JSON schema validation
+## OQ-4: Initial-sync progress UX threshold (deferred to sync work)
 
-Workflow definitions are pulled from `/workflows/*.json` and cached in the `workflows` table. Today the spec describes the format prose-only — there is no JSON Schema and no runtime validation.
+Bulk-pull progress banner: always, or only above some threshold? Decision belongs with the first sync plugin in Phase 4.
 
-**Risk:** a malformed workflow JSON (committed by hand) silently fails at execution time with a cryptic error.
+**Likely resolution:** time-based — show banner if sync hasn't completed within 1–2 seconds.
+
+---
+
+## OQ-NEW-1: Which built-in QuKi-Toss ships first?
+
+MVP requires at least one built-in transport (ADR-14, manifesto). Candidates:
+
+- (a) **Clipboard** — copy markdown to system clipboard. Zero deps, zero auth, proves the plugin loader + UI.
+- (b) **Share sheet** — hand markdown to `share_plus` → native share. One dep, no auth.
+- (c) **Append-to-GitHub-file** — the closest analogue to the original "daily log" use case. Needs OAuth (Phase 4 territory) — would push transports back unless an unauthenticated short-circuit (e.g. PAT pasted in settings) is acceptable for the first cut.
+
+**Likely resolution:** ship (a) first as the architecture-proving transport, then (b) shortly after. Defer (c) until OAuth helper exists.
+
+**Surface during:** Phase 2 kickoff.
+
+---
+
+## OQ-NEW-2: Plugin discovery model — built-in only vs pubspec-declared optional
+
+In v1 plugins are built-in (registered at compile time in `lib/core/transports/registry.dart`). Should we support:
+
+- (a) **Built-in only** — every transport ships in the same APK. Simplest. New transports require a new app version.
+- (b) **Pubspec-declared optional packages** — `pubspec.yaml` lists optional dev deps; user opts in by reinstalling a flavour build. Half-measure.
+- (c) **Runtime plugin loading** — Dart isn't built for this without effort (no shared libs, no isolate-based plugin model in stable Flutter). Probably not v1.
+
+**Likely resolution:** (a) for MVP and probably v1.x. Re-evaluate if third parties start writing transports.
+
+**Surface during:** Phase 2.
+
+---
+
+## OQ-NEW-3: Linux distribution format
+
+Tarball, AppImage, Flatpak, or Snap for Linux release artifacts?
+
+- **Tarball** — simplest, no signing, user runs `./quki_notes` from extracted dir. Good for testing.
+- **AppImage** — single-file, broad distro support, no install required.
+- **Flatpak** — sandboxed, Flathub distribution path, more ceremony.
+- **Snap** — Ubuntu-first, snapd dep, controversial.
+
+**Likely resolution:** ship a tarball in the first Linux build artifact; promote to AppImage if Linux usage justifies it. Flatpak/Snap only if a user explicitly asks.
+
+**Surface during:** Phase 3 — Linux CI wiring.
+
+---
+
+## OQ-NEW-4: Linux `flutter_secure_storage` keyring matrix
+
+`flutter_secure_storage` on Linux uses `libsecret`, which requires a Secret Service implementation (GNOME Keyring, KeePassXC's secret-service, KWallet bridge). On a vanilla server install or a headless WM there may be no Secret Service running.
+
+**Risk:** plugins that store tokens (any OAuth-using transport, any sync backend) fail to initialise on Linux when no keyring is available.
 
 **Options:**
-- Write a JSON Schema and validate at pull time; reject the workflow with a clear error in Settings → Workflows.
-- Validate via Dart class deserialization (`fromJson`); if deserialization throws, mark the workflow `error` with the exception message.
+- (a) Hard fail with clear error directing user to install + start gnome-keyring (or equivalent).
+- (b) Fall back to an encrypted-at-rest file in the app docs dir (security ≈ zero against local-user attacker but workable for a personal app).
+- (c) Refuse to install plugins that need secrets when keyring is absent.
 
-**Surface during:** Phase 3, workflow engine implementation.
+**Surface during:** First plugin that calls `flutter_secure_storage` on Linux.
 
-**Likely resolution:** option (b) — leverages existing typed deserialization without adding a JSON Schema dependency.
+---
+
+## Resolved / Removed
+
+- **OQ-5: Workflow JSON schema validation** — **Removed.** Workflow JSON DSL dropped entirely per ADR-14. Transports are Dart code; no JSON schema to validate.
+
+---
+
+**Last Updated**: 2026-05-28

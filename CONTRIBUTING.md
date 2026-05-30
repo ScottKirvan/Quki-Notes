@@ -1,6 +1,8 @@
 # Contributing to QuKi-Notes
 
-First off, thank you for considering contributing to QuKi-Notes! It's people like you that make this template better for everyone.
+First off, thank you for considering contributing to QuKi-Notes!
+
+> **Note:** This is currently a personal project in early planning. External contributions aren't expected yet, but the design docs in `notes/dev/` are public — feel free to read along. Start with [`notes/dev/manifesto.md`](notes/dev/manifesto.md) to understand what QuKi-Notes is (and isn't).
 
 ## Code of Conduct
 
@@ -54,11 +56,13 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) with [Semant
 
 **Examples:**
 ```
-feat: add Python .gitignore template
-fix: correct LICENSE badge URL in README
-docs: update installation instructions
-feat!: change template initialization workflow
+feat(editor): add formatting toolbar
+fix(stream): preserve scroll position after swipe-to-delete
+docs: clarify ephemerality model in manifesto
+feat!: change transport plugin interface signature
 ```
+
+See `notes/dev/pr_template.md` for the full PR title format and body template.
 
 ### Pull Request Process
 
@@ -69,36 +73,22 @@ feat!: change template initialization workflow
 
 ## Development Setup
 
+See [`notes/dev/dev_env_setup.md`](notes/dev/dev_env_setup.md) for the full Windows 11 + Pixel 6 Pro + Linux setup walkthrough.
+
+Once set up:
+
 1. Fork and clone the repository
-2. Create a new branch for your feature/fix
-3. Make your changes
-4. Test your changes by creating a new repository from your template
-5. Submit a pull request
+2. Create a feature branch (`feat/...`, `fix/...`, `chore/...`)
+3. Make your changes; run `just lint` and `just test`
+4. Submit a PR using `notes/dev/pr_template.md` for the body
 
 ## Project Structure
 
-```
-QuKi-Notes/
-├── .github/
-│   ├── gitignore-templates/  # Example .gitignore files
-│   ├── ISSUE_TEMPLATE/       # Issue templates
-│   ├── workflows/            # GitHub Actions
-│   └── PULL_REQUEST_TEMPLATE.md
-├── assets/                   # Images and CSS for GitHub Pages
-├── notes/                    # CHANGELOG, VERSION, TODO
-├── README.md
-├── LICENSE.md
-└── CONTRIBUTING.md
-```
+See [`notes/dev/design_spec.md`](notes/dev/design_spec.md) → Project Structure for the full layout.
 
 ## Testing
 
-When making changes to the template initialization workflow, test by:
-
-1. Creating a new repository from your modified template
-2. Verifying the workflow runs successfully
-3. Checking that all repository references are updated correctly
-4. Confirming the workflow deletes itself after completion
+See [`notes/dev/testing.md`](notes/dev/testing.md). Tests ship with the code in every PR (ADR-13). Bug fixes follow the regression-test-first protocol.
 
 ## Questions?
 

@@ -10,27 +10,25 @@ This file is the operational spec. The policy decision lives in `decisions.md` �
 
 | Layer           | Tool                        | What goes here                                                                                                                                               |
 | --------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Unit            | `flutter_test` + `mocktail` | Pure logic, services with substitutable deps, DAOs (against in-memory drift), serializers, workflow action types, template token resolution                  |
-| Widget          | `flutter_test`              | UI behaviour where the widget has non-trivial state or transforms input (formatting toolbar, conflict resolution sheet, sync indicator, image-paste handler) |
-| Integration     | `integration_test/`         | End-to-end flows across DB + UI on a real device or emulator (note CRUD round-trip, paste→render→save→reopen, sync push/pull cycle)                          |
+| Unit            | `flutter_test` + `mocktail` | Pure logic, services with substitutable deps, DAOs (against in-memory drift), serializers, transport plugins' core logic                                     |
+| Widget          | `flutter_test`              | UI behaviour where the widget has non-trivial state or transforms input (formatting toolbar, toss sheet, image-paste handler)                                |
+| Integration     | `integration_test/`         | End-to-end flows across DB + UI on a real device or emulator (QuKi CRUD round-trip, paste→render→save→reopen, toss success/failure)                          |
 | Drift migration | `drift_dev schema verify`   | Schema snapshots in `test/db/schemas/`. Required for every `schemaVersion` bump per ADR-8                                                                    |
 
 ---
 
 ## What must have a test
 
-- Every workflow action type (`append_to_github_file`, `push_to_github`, `prepend_template`, `append_template`, `insert_todo`)
-- Every template token resolution (`{{date}}`, `{{time}}`, `{{gps}}`, `{{address}}`)
-- Sync state machine transitions (`pending_push` → `synced`, `pending_push` → `conflict`, etc.)
-- Conflict resolution decision branches
+- Every transport plugin's `toss()` happy path + at least one failure path (retryable + non-retryable)
+- Every transport plugin's `settingsView` validation (rejecting bad input, persisting good input)
 - The save controller's debounce/periodic/lifecycle triggers
+- The 24h delete-sweep behaviour (boundary cases)
 - Image paste validation (size limits, MIME type whitelist)
 - Image-ref diff at save time (detecting removed `![](../images/...)` references for cascade delete)
-- Filename generation (`YYYY-MM-DD-{uuid8}.md` format, deterministic from id + createdAt)
-- Filename parsing on pull (reverse: extract date and store as `createdAt`)
-- GitHub rate-limit throttle logic (pauses when `X-RateLimit-Remaining < 100`)
+- Filename generation (`YYYY-MM-DD-{uuid8}.{ext}` for images and `.md` for transport-derived QuKi filenames)
 - Markdown round-trip through `super_editor` for every GFM feature in the toolbar (resolves OQ-1)
 - Every `MigrationStrategy.onUpgrade` step (per ADR-8)
+- When sync ships (v1.1+): sync state machine transitions, conflict resolver, rate-limit throttle, OAuth device flow polling
 
 ## What does NOT need a test
 
@@ -52,27 +50,25 @@ Mirror `lib/`:
 test/
 ├── core/
 │   ├── database/
-│   │   ├── notes_dao_test.dart
+│   │   ├── qukis_dao_test.dart
+│   │   ├── images_dao_test.dart
 │   │   └── ...
-│   ├── github/
-│   │   ├── github_client_test.dart
-│   │   └── rate_limit_test.dart
-│   ├── sync/
-│   │   ├── sync_controller_test.dart
+│   ├── transports/
+│   │   ├── transport_registry_test.dart
 │   │   ├── save_controller_test.dart
-│   │   └── conflict_resolver_test.dart
+│   │   └── plugins/
+│   │       ├── clipboard_toss_test.dart
+│   │       └── ...
 │   └── settings/
 ├── features/
 │   ├── editor/
-│   ├── documents/
-│   └── workflows/
-│       ├── action_append_to_github_file_test.dart
-│       └── template_tokens_test.dart
+│   ├── stream/
+│   └── settings/
 ├── shared/
 └── db/
     └── schemas/        ← drift snapshots, do not edit by hand
 integration_test/
-├── note_crud_flow_test.dart
+├── quki_crud_flow_test.dart
 └── ...
 ```
 
@@ -83,9 +79,9 @@ integration_test/
 ## Mocking discipline
 
 - **`mocktail`** is the only mock library used. No `mockito` (deprecated codegen approach).
-- **Mock services, not data.** `GitHubClient` is mocked; `Note` / `Workflow` are constructed directly.
+- **Mock services, not data.** Services (transports, future `GitHubClient`, future `SyncBackend`) are mocked; `Quki` / `Image` data classes are constructed directly.
 - **Database tests use real drift** with `NativeDatabase.memory()` — never mock drift. The DAO layer is the boundary; mock it only when testing something built on top of it.
-- **Network**: never make real HTTP in unit/widget tests. `dio` is mocked at the client wrapper level. Integration tests may hit a sandbox GitHub repo (deferred — for MVP, integration tests stop at the GitHubClient boundary).
+- **Network**: never make real HTTP in unit/widget tests. `dio` (when used by a transport) is mocked at the client wrapper level. Integration tests may hit a sandbox endpoint in v1.1+ when transports/sync need it (deferred — for MVP, no network in any test).
 
 ---
 
@@ -149,10 +145,10 @@ flutter test integration_test/
 | Phase | Key tests to add |
 |---|---|
 | 0 (bootstrap) | Generated default widget test passes — proves CI toolchain works |
-| 1 (local capture) | DAO tests (notes + images), save controller triggers, formatting toolbar widget tests, image paste validation, image-ref diff, super_editor round-trip |
-| 2 (sync) | GitHubClient with mocked dio, sync state machine, conflict resolver, rate-limit throttle, OAuth device flow polling |
-| 3 (workflows) | Each action type, template tokens, workflow engine dispatch, geocoding fallback |
-| 4 (sharing/polish) | Native share roundtrip (widget), accessibility semantics, integration tests for full flows |
-| 5 (windows port) | Platform-specific quirks (keyboard shortcuts, file path separators) |
+| 1 (local capture) | DAO tests (qukis + images), save controller triggers, 24h delete sweep, formatting toolbar widget tests, image paste validation, image-ref diff, super_editor round-trip |
+| 2 (transports) | Transport registry tests, first built-in toss (likely clipboard) happy + failure paths, toss-sheet widget test, settings view for each plugin |
+| 3 (polish + Win + Linux) | Share-in handler, accessibility semantics, integration tests for full capture→toss flows, platform-specific quirks (keyboard shortcuts, file path separators, libsecret on Linux) |
+| 4 (sync, v1.1+) | First sync backend with mocked dio, sync state machine, conflict resolver, rate-limit throttle, OAuth device flow polling |
+| 6 (MCP, v2.0+) | MCP server handler tests, JSON-RPC envelope round-trip, capability negotiation |
 
-Phase 4's "basic testing" line in `design_spec.md` is now obsolete — tests come with code from Phase 1.
+Tests come with code from Phase 1 onward — no "tests come later" phase.

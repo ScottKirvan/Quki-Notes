@@ -2,7 +2,10 @@
 
 Audience: **Scott**. One-time install for the dev box. Sonnet does not run any of this — it's the foundation Sonnet's PRs target.
 
-Test target: **Pixel 6 Pro** (Android) + **Windows 11** desktop build.
+Test targets:
+- **Pixel 6 Pro** (Android) — primary
+- **Windows 11** desktop build — local
+- **Linux desktop** — third active target (Phase 3). For initial development, rely on the `build-linux.yml` CI workflow rather than installing a local Linux dev env. A WSL2 / VM / spare box setup can be added later if local Linux iteration becomes necessary.
 
 ---
 
@@ -246,7 +249,7 @@ gh pr view <release-pr-number>    # eyeball the version bump + CHANGELOG
 gh pr merge <release-pr-number> --squash
 ```
 
-Merging triggers tag creation → build workflows fire → APK and Windows MSIX uploaded to the GitHub Release.
+Merging triggers tag creation → build workflows fire → APK, Windows build, and Linux tarball uploaded to the GitHub Release.
 
 ---
 

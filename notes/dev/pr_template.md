@@ -13,11 +13,12 @@ Use this as the **body** of every PR. The **title** is the conventional commit m
 | `feat!` / `BREAKING CHANGE:` in body | Major version bump |
 | `chore`, `docs`, `refactor`, `test`, `build`, `ci` | No version bump; appears in CHANGELOG |
 
-Scope is the feature folder name when applicable: `feat(editor):`, `fix(sync):`, `feat(workflow):`. Omit scope for cross-cutting changes.
+Scope is the feature folder name when applicable: `feat(editor):`, `feat(stream):`, `feat(transports):`. Omit scope for cross-cutting changes.
 
 **Examples:**
 - `feat(editor): add formatting toolbar with bold/italic/strikethrough`
-- `fix(sync): retry workflow append on 409 conflict`
+- `feat(transports): add clipboard toss as first built-in transport`
+- `fix(stream): preserve scroll position after swipe-to-delete`
 - `chore(deps): pin flutter_secure_storage to 9.x`
 
 ## Body template
@@ -66,12 +67,14 @@ choice, list it here and confirm it was added to `decisions.md` /
 - [ ] No flaky tests added (no `Future.delayed`, no wall-clock dependencies; inject the clock)
 - [ ] Branch name follows convention (`feat/phase<N>-<slug>` or `fix/<slug>`)
 - [ ] No commits to `main`; no force-push; no `--no-verify`
-- [ ] OAuth tokens / note contents not logged anywhere added in this PR
+- [ ] Plugin secrets / OAuth tokens / full QuKi contents not logged anywhere added in this PR
+- [ ] No vault-like features introduced (folders, tags, backlinks, archive, pinning) — see `manifesto.md` "Is NOT" list
+- [ ] No Flutter imports leaked into `lib/core/` or `lib/shared/models/` (ADR-16)
 ```
 
 ## PR sizing
 
-Per `CLAUDE.md`: one PR = one logical unit — a single screen, a single service, a single workflow action type. If scope creeps past what can be tested in a single sitting, stop and split.
+Per `CLAUDE.md`: one PR = one logical unit — a single screen, a single service, a single transport plugin. If scope creeps past what can be tested in a single sitting, stop and split.
 
 ## CI expectations
 

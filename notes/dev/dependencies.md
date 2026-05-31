@@ -1,6 +1,6 @@
 # Dependencies
 
-Versions are filled at the Phase 1 kickoff PR (which establishes `pubspec.yaml`). Pin to compatible-version ranges (`^x.y.z`).
+Versions track what's currently pinned in `pubspec.yaml`. Use compatible-version ranges (`^x.y.z`). `TBD` = package not yet added (lands at the phase noted in the section header).
 
 **Rule**: do not add a new runtime dependency without first proposing an ADR in `decisions.md`. Dev-only dependencies (test, codegen) can be added inline.
 
@@ -11,17 +11,17 @@ Versions are filled at the Phase 1 kickoff PR (which establishes `pubspec.yaml`)
 | Package | Version | Purpose |
 |---|---|---|
 | `flutter` (sdk) | — | Framework |
-| Dart SDK | `>=3.x <4.0.0` | Language |
-| `flutter_riverpod` | TBD | State management runtime |
-| `riverpod_annotation` | TBD | `@riverpod` annotation |
-| `drift` | TBD | SQLite ORM runtime |
-| `sqlite3_flutter_libs` | TBD | Bundled SQLite library |
-| `path_provider` | TBD | App documents directory |
-| `uuid` | TBD | UUID v4 generation |
-| `super_editor` | TBD | WYSIWYG markdown editor |
-| `super_clipboard` | TBD | Clipboard image paste |
-| `shared_preferences` | TBD | Non-sensitive settings |
-| `logging` | TBD | Structured logger |
+| Dart SDK | `>=3.5.0 <4.0.0` | Language |
+| `flutter_riverpod` | `^3.3.1` | State management runtime |
+| `riverpod_annotation` | `^4.0.2` | `@riverpod` annotation |
+| `drift` | `^2.33.0` | SQLite ORM runtime |
+| `sqlite3_flutter_libs` | `^0.6.0+eol` | Bundled SQLite library |
+| `path_provider` | `^2.1.5` | App documents directory |
+| `uuid` | `^4.5.3` | UUID v4 generation |
+| `super_editor` | TBD | WYSIWYG markdown editor — **deferred from Phase 0 pubspec** (Gradle 9 / CargoKit blocker, see Notes) |
+| `super_clipboard` | TBD | Clipboard image paste — **deferred from Phase 0 pubspec** (same blocker as `super_editor`) |
+| `shared_preferences` | `^2.5.5` | Non-sensitive settings |
+| `logging` | `^1.3.0` | Structured logger |
 
 ### Transports (Phase 2 — for first built-in QuKi-Toss)
 
@@ -52,14 +52,15 @@ Additional transport-specific packages (e.g. `dio`, `flutter_secure_storage`, `u
 
 | Package | Version | Purpose |
 |---|---|---|
-| `build_runner` | TBD | Code-generation runner |
-| `riverpod_generator` | TBD | Generates providers from `@riverpod` |
-| `drift_dev` | TBD | Generates drift code + schema verification |
-| `flutter_lints` | TBD | Lint rules |
-| `mocktail` | TBD | Test mocks (no codegen) |
+| `build_runner` | `^2.15.0` | Code-generation runner |
+| `riverpod_generator` | `^4.0.4-dev.1` | Generates providers from `@riverpod` (no stable 4.x yet; pre-release tracks `riverpod_annotation 4.0.2`) |
+| `drift_dev` | `^2.33.0` | Generates drift code + schema verification |
+| `flutter_lints` | `^6.0.0` | Lint rules |
+| `mocktail` | `^1.0.5` | Test mocks (no codegen) |
 
 ## Notes
 
+- **`super_editor` + `super_clipboard` Gradle 9 / CargoKit blocker** (discovered Phase 0, 2026-05-31): on Android, `super_clipboard ^0.9.1` / `super_editor ^0.3.0-dev.51` resolve `super_native_extensions 0.9.1`, which depends on `irondash_engine_context 0.5.5`. That package bundles a CargoKit `plugin.gradle` calling `Project.exec()` — removed in Gradle 9.0. Flutter 3.44.0 ships Gradle 9.1.0 and the bundled AGP requires Gradle ≥ 9.1.0, so downgrading is not an option. Older `super_editor 0.2.x` builds fail earlier (missing `namespace` field in `super_native_extensions 0.7.0` Android `build.gradle`). Both packages were removed from the Phase 0 `pubspec.yaml`. **At Phase 1 kickoff**: check pub.dev for `irondash_engine_context > 0.5.5` (CargoKit migrated to `ExecOperations`) and a stable `super_editor` release that pulls it in. If neither has shipped, open an issue against `nickel-lang/cargokit` or `superlistapp/super_native_extensions`. Full incident notes in `zz_WHITEBOARD.md`.
 - **`super_editor` ↔ markdown round-trip** is a known open question (`open_questions.md` → OQ-1). If GFM features (task lists, tables) don't round-trip cleanly, fallback is `appflowy_editor`.
 - **`super_clipboard` Windows + Linux support** — verify on each desktop target during Phase 3.
 - **`flutter_secure_storage` on Linux** uses libsecret — see OQ-NEW-4 for the keyring availability problem.

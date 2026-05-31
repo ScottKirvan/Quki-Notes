@@ -1,8 +1,10 @@
+set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
+
 default:
     @just --list
 
 android:
-    flutter run -d android
+    flutter run -d emulator
 
 windows:
     flutter run -d windows

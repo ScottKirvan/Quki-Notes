@@ -3,9 +3,8 @@ set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 default:
     @just --list
 
-android:
-    flutter run -d emulator
-
+android device='':
+    flutter run {{ if device != '' { '--device-id ' + device } else { '' } }}
 windows:
     flutter run -d windows
 
